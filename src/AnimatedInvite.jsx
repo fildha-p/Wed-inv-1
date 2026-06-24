@@ -250,9 +250,9 @@ function IntroOverlay({ config, reducedMotion, onOpen }) {
     return () => window.clearTimeout(timer);
   }, [gone, prelude, reducedMotion]);
 
-  if (reducedMotion || gone) return null;
+  if (gone) return null;
 
-  if (prelude) {
+  if (prelude && !reducedMotion) {
     return (
       <div className="intro-prelude" aria-label="Save the date">
         <LeafMark className="intro-prelude-leaf" />
@@ -265,7 +265,7 @@ function IntroOverlay({ config, reducedMotion, onOpen }) {
     if (opening) return;
     setOpening(true);
     await onOpen();
-    window.setTimeout(() => setGone(true), introStyle === 'envelope' ? 2100 : 1380);
+    window.setTimeout(() => setGone(true), reducedMotion ? 180 : introStyle === 'envelope' ? 2100 : 1380);
   };
 
   if (introStyle === 'envelope') {
@@ -833,12 +833,10 @@ export default function AnimatedInvite({ config }) {
   const [leafFall, setLeafFall] = useState(false);
   const [leafPop, setLeafPop] = useState(false);
 
-  useEffect(() => {
-    if (reducedMotion) setOpened(true);
-  }, [reducedMotion]);
-
   const openInvitation = async () => {
-    playEnvelopeOpenSound({ muted });
+    if (!reducedMotion) {
+      playEnvelopeOpenSound({ muted });
+    }
 
     if (!reducedMotion) {
       setLeafPop(true);
@@ -856,7 +854,10 @@ export default function AnimatedInvite({ config }) {
         setPlaying(false);
       }
     }
-    window.setTimeout(() => setOpened(true), config.introStyle === 'envelope' ? 1900 : 1180);
+    window.setTimeout(
+      () => setOpened(true),
+      reducedMotion ? 120 : config.introStyle === 'envelope' ? 1900 : 1180,
+    );
   };
 
   return (
