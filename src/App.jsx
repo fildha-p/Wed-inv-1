@@ -9,7 +9,7 @@ const CONFIG = {
   envBg: '/env-bg.jpg',
   floralTop: '/floral-top.png',
   floralBottom: '/floral-bottom.png',
-  waxSeal: '/wax-seal.png',
+  waxSeal: '/wax-seal.jpeg',
   inviteScript: "You're Invited!",
   openLabel: 'Click to open',
   couple: {
