@@ -1017,6 +1017,19 @@ h2 {
   line-height: 1.35;
 }
 
+.muhurtham-line {
+  display: inline-block;
+  width: auto;
+  max-width: min(100%, 620px);
+  padding: 10px 22px;
+  border: 1px solid rgba(176, 138, 79, 0.24);
+  border-radius: 999px;
+  background: rgba(250, 243, 230, 0.42);
+  color: var(--sage);
+  font-size: clamp(1rem, 3.6vw, 1.22rem);
+  letter-spacing: 0.02em;
+}
+
 .venue-name {
   margin-top: 0;
   padding: 24px clamp(18px, 4vw, 42px);
@@ -1112,6 +1125,37 @@ h2 {
   font-family: var(--hand);
   font-size: clamp(2rem, 7vw, 3rem);
   line-height: 1;
+}
+
+.signature-link {
+  position: relative;
+  display: inline-block;
+  margin-top: 18px;
+  color: var(--gold);
+  font-family: var(--display);
+  font-size: clamp(0.88rem, 2.4vw, 1.05rem);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.signature-link::after {
+  position: absolute;
+  right: 0;
+  bottom: -4px;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  content: '';
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 240ms ease;
+}
+
+.signature-link:hover::after,
+.signature-link:focus-visible::after {
+  transform: scaleX(1);
 }
 
 .music-dock {
@@ -2155,59 +2199,122 @@ h2 {
 .timeline {
   position: relative;
   display: grid;
-  gap: 10px;
-  width: min(100%, 560px);
-  padding: 24px 24px 24px 58px;
-  border-block: 0;
-  border: 1px solid rgba(169, 138, 87, 0.24);
-  border-radius: 14px;
-  background: rgba(255, 250, 241, 0.56);
-  box-shadow: 0 18px 42px rgba(56, 71, 58, 0.1);
-  text-align: left;
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: clamp(32px, 5vw, 52px) clamp(24px, 5vw, 58px);
+  border: 1px solid rgba(176, 138, 79, 0.34);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 250, 241, 0.92), rgba(250, 243, 230, 0.72) 58%, rgba(244, 236, 224, 0.54)),
+    linear-gradient(90deg, transparent, rgba(255, 250, 241, 0.62) 18% 82%, transparent);
+  box-shadow:
+    0 26px 62px rgba(56, 71, 58, 0.16),
+    0 0 38px rgba(176, 138, 79, 0.16),
+    inset 0 0 0 10px rgba(255, 250, 241, 0.22),
+    inset 0 0 0 11px rgba(176, 138, 79, 0.1);
+  overflow: hidden;
+  text-align: center;
 }
 
 .timeline::before,
 .timeline::after {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 34px;
-  width: 1px;
+  left: 50%;
+  width: min(56%, 360px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(176, 138, 79, 0.62), transparent);
   content: '';
+  transform: translateX(-50%);
 }
 
 .timeline::before {
-  background: rgba(169, 138, 87, 0.28);
+  top: clamp(18px, 3vw, 26px);
 }
 
 .timeline::after {
-  background: var(--gold);
-  transform: scaleY(var(--timeline-progress, 0));
-  transform-origin: top;
+  bottom: clamp(18px, 3vw, 26px);
 }
 
 .timeline-entry {
   position: relative;
-  padding: 22px 0;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.timeline-entry::before,
+.timeline-entry::after {
+  position: absolute;
+  top: 50%;
+  width: clamp(48px, 10vw, 86px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(176, 138, 79, 0.52), transparent);
+  content: '';
+  opacity: 0.72;
+}
+
+.timeline-entry::before {
+  right: calc(50% + 110px);
+}
+
+.timeline-entry::after {
+  left: calc(50% + 110px);
 }
 
 .timeline-dot {
-  position: absolute;
-  top: 34px;
-  left: -31px;
-  z-index: 2;
-  width: 15px;
-  height: 15px;
-  border: 1px solid var(--gold);
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border: 1px solid rgba(176, 138, 79, 0.6);
   border-radius: 50%;
-  background: var(--ivory);
-  transform: scale(0.8);
-  transition: background 420ms ease, box-shadow 420ms ease, transform 420ms ease;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255, 250, 241, 0.96), rgba(250, 243, 230, 0.78)),
+    var(--paper);
+  box-shadow:
+    0 16px 34px rgba(176, 138, 79, 0.18),
+    0 0 0 8px rgba(176, 138, 79, 0.08),
+    inset 0 0 0 7px rgba(255, 250, 241, 0.38);
+  color: var(--gold);
+  transform: scale(0.94);
+  transition: box-shadow 420ms ease, transform 420ms ease;
+}
+
+.timeline-dot-leaf {
+  width: 52px;
+  height: auto;
+}
+
+.timeline-title {
+  color: var(--sage);
+  font-family: var(--display);
+  font-size: clamp(1.2rem, 3.2vw, 1.45rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.timeline-entry strong {
+  color: var(--deep-sage);
+  font-family: var(--hand);
+  font-size: clamp(3.2rem, 8vw, 5rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.9;
+  text-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.56),
+    0 1px 0 rgba(176, 138, 79, 0.16);
 }
 
 .timeline-entry.is-lit .timeline-dot {
-  background: var(--gold);
-  box-shadow: 0 0 0 8px rgba(169, 138, 87, 0.14);
+  box-shadow:
+    0 18px 38px rgba(176, 138, 79, 0.22),
+    0 0 0 10px rgba(176, 138, 79, 0.12),
+    0 0 34px rgba(176, 138, 79, 0.24),
+    inset 0 0 0 7px rgba(255, 250, 241, 0.38);
   transform: scale(1);
 }
 
@@ -2903,12 +3010,50 @@ h2 {
     box-sizing: border-box;
     width: 100%;
     max-width: 100%;
-    padding: 20px 18px 20px 48px;
+    padding: 30px 18px;
+    border-radius: 14px;
   }
 
-  .timeline::before,
-  .timeline::after {
-    left: 27px;
+  .timeline-entry {
+    gap: 10px;
+  }
+
+  .timeline-entry::before,
+  .timeline-entry::after {
+    width: 38px;
+  }
+
+  .timeline-entry::before {
+    right: calc(50% + 82px);
+  }
+
+  .timeline-entry::after {
+    left: calc(50% + 82px);
+  }
+
+  .timeline-dot {
+    width: 62px;
+    height: 62px;
+  }
+
+  .timeline-dot-leaf {
+    width: 44px;
+  }
+
+  .timeline-title {
+    font-size: 0.9rem;
+    letter-spacing: 0.11em;
+  }
+
+  .timeline-entry strong {
+    font-size: clamp(2.4rem, 11vw, 3.4rem);
+  }
+
+  .muhurtham-line {
+    width: min(100%, 320px);
+    padding: 10px 16px;
+    border-radius: 18px;
+    font-size: 0.96rem;
   }
 
   .opening-leaf-fall {
@@ -2957,6 +3102,12 @@ h2 {
     font-size: clamp(1.35rem, 5.8vw, 1.9rem);
     line-height: 1.06;
     text-wrap: balance;
+  }
+
+  .signature-link {
+    margin-top: 14px;
+    font-size: 0.76rem;
+    letter-spacing: 0.09em;
   }
 
   .venue-name {

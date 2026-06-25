@@ -631,8 +631,10 @@ function Timeline({ config }) {
     <div className="timeline" ref={timelineRef} aria-label="Event timeline">
       {config.events.map((event) => (
         <article className="timeline-entry" key={`${event.title}-${event.time}`}>
-          <span className="timeline-dot" aria-hidden="true" />
-          <span>{event.title}</span>
+          <span className="timeline-dot" aria-hidden="true">
+            <LeafMark className="timeline-dot-leaf" />
+          </span>
+          <span className="timeline-title">{event.title}</span>
           <strong>{event.time}</strong>
         </article>
       ))}
@@ -928,6 +930,9 @@ export default function AnimatedInvite({ config }) {
           </div>
         </div>
         <p className="compliments">{config.footerLine}</p>
+        <a className="signature-link" href="https://www.instagram.com/vow.ra" target="_blank" rel="noreferrer">
+          An Invitation by @vow.ra
+        </a>
       </footer>
 
       <MusicControl
