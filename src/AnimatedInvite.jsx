@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(() =>
@@ -393,9 +394,24 @@ function PrintedCardStage({ config, active, reducedMotion }) {
 
 function DateReveal({ config }) {
   const [revealed, setRevealed] = useState(false);
+  const [hintActive, setHintActive] = useState(false);
+  const [cardOpen, setCardOpen] = useState(false);
   const dragStartRef = useRef(null);
+  const sparkles = useMemo(
+    () =>
+      Array.from({ length: 10 }, (_, index) => ({
+        id: index,
+        sx: `${-36 + ((index * 17) % 73)}px`,
+        sy: `${40 + ((index * 13) % 51)}px`,
+        sd: `${(index % 6) * 0.08}s`,
+        sdur: `${0.9 + (index % 5) * 0.16}s`,
+        ssize: `${4 + (index % 6)}px`,
+      })),
+    [],
+  );
 
   const beginDrag = (event) => {
+    setHintActive(true);
     dragStartRef.current = event.clientX;
   };
 
@@ -403,39 +419,100 @@ function DateReveal({ config }) {
     if (dragStartRef.current == null || revealed) return;
     if (Math.abs(event.clientX - dragStartRef.current) > 38) {
       setRevealed(true);
+      setCardOpen(true);
       dragStartRef.current = null;
     }
   };
 
   const endDrag = () => {
+    setHintActive(false);
     dragStartRef.current = null;
   };
 
+  const revealDate = () => {
+    setRevealed(true);
+    setCardOpen(true);
+  };
+
+  const closeCard = () => setCardOpen(false);
+
+  useEffect(() => {
+    if (!cardOpen) return undefined;
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setCardOpen(false);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [cardOpen]);
+
   return (
-    <button
-      className={`date-reveal ${revealed ? 'is-revealed' : ''}`}
-      type="button"
-      onClick={() => setRevealed(true)}
-      onPointerDown={beginDrag}
-      onPointerMove={moveDrag}
-      onPointerUp={endDrag}
-      onPointerCancel={endDrag}
-      aria-expanded={revealed}
-      aria-label="Reveal wedding date"
-    >
-      <span className="thread-reveal-front" aria-hidden={revealed}>
-        <span className="gold-thread" />
-        <span className="thread-charm">
-          <LeafMark className="thread-leaf" />
+    <>
+      <button
+        className={`date-reveal ${revealed ? 'is-revealed' : ''} ${hintActive && !revealed ? 'is-hint-active' : ''}`}
+        type="button"
+        onClick={revealDate}
+        onPointerEnter={() => !revealed && setHintActive(true)}
+        onPointerLeave={() => setHintActive(false)}
+        onPointerDown={beginDrag}
+        onPointerMove={moveDrag}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        aria-expanded={revealed}
+        aria-label="Reveal wedding date"
+      >
+        <span className="thread-reveal-front" aria-hidden={revealed}>
+          <span className="gold-thread" />
+          <span className="thread-charm">
+            <LeafMark className="thread-leaf" />
+          </span>
+          <span className="thread-sparkles" aria-hidden="true">
+            {sparkles.map((sparkle) => (
+              <span
+                className="thread-spark"
+                key={sparkle.id}
+                style={{
+                  '--sx': sparkle.sx,
+                  '--sy': sparkle.sy,
+                  '--sd': sparkle.sd,
+                  '--sdur': sparkle.sdur,
+                  '--ssize': sparkle.ssize,
+                }}
+              />
+            ))}
+          </span>
+          <span className="thread-label">Pull or tap the golden thread</span>
         </span>
-        <span className="thread-label">Pull or tap the golden thread</span>
-        <span className="thread-hint" aria-hidden="true">drag gently</span>
-      </span>
-      <span className="date-ribbon">
-        <span>{config.wedding.dateLabel}</span>
-        <span>{config.wedding.malayalamDate}</span>
-      </span>
-    </button>
+        <span className="date-ribbon">
+          <span>{config.wedding.dateLabel}</span>
+          <span>{config.wedding.malayalamDate}</span>
+        </span>
+      </button>
+      {cardOpen &&
+        createPortal(
+          <div
+            className="date-card-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Wedding date"
+            onClick={closeCard}
+          >
+            <div className="date-card" onClick={(event) => event.stopPropagation()}>
+              <button className="date-card-close" type="button" onClick={closeCard} aria-label="Close">
+                &times;
+              </button>
+              <span className="date-card-leaf" aria-hidden="true">
+                <LeafMark />
+              </span>
+              <p className="date-card-eyebrow">Save the Date</p>
+              <p className="date-card-main">{config.wedding.dateLabel}</p>
+              <p className="date-card-sub">{config.wedding.malayalamDate}</p>
+            </div>
+          </div>,
+          document.body,
+        )}
+    </>
   );
 }
 
@@ -492,115 +569,15 @@ function Countdown({ config }) {
   );
 }
 
-function CarouselImage({ src, index, active }) {
-  const [failed, setFailed] = useState(false);
-
+function PhotoDateStrip({ config }) {
+  const photos = [config.assets.images[0], config.assets.images[1], config.assets.images[2]];
   return (
-    <figure className={`carousel-frame photo-${index} ${active ? 'is-active' : ''} ${failed ? 'image-fallback' : ''}`}>
-      {!failed ? (
-        <img
-          src={src}
-          alt={`Dr Aiswarya and Dr Anugrah ${index + 1}`}
-          loading={index === 0 ? 'eager' : 'lazy'}
-          onError={() => setFailed(true)}
-        />
-      ) : (
-        <LeafMark className="fallback-leaf" />
-      )}
-    </figure>
-  );
-}
-
-function GalleryCarousel({ config, reducedMotion }) {
-  const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const dragRef = useRef({ startX: 0, deltaX: 0, dragging: false });
-  const total = config.assets.images.length;
-
-  const goTo = (index) => {
-    setActive((index + total) % total);
-  };
-
-  useEffect(() => {
-    if (reducedMotion || paused) return undefined;
-    const timer = window.setInterval(() => {
-      setActive((current) => (current + 1) % total);
-    }, 6200);
-    return () => window.clearInterval(timer);
-  }, [paused, reducedMotion, total]);
-
-  const onPointerDown = (event) => {
-    dragRef.current = { startX: event.clientX, deltaX: 0, dragging: true };
-    event.currentTarget.setPointerCapture(event.pointerId);
-  };
-
-  const onPointerMove = (event) => {
-    if (!dragRef.current.dragging) return;
-    dragRef.current.deltaX = event.clientX - dragRef.current.startX;
-  };
-
-  const onPointerUp = (event) => {
-    if (!dragRef.current.dragging) return;
-    const { deltaX } = dragRef.current;
-    dragRef.current.dragging = false;
-    event.currentTarget.releasePointerCapture(event.pointerId);
-
-    if (Math.abs(deltaX) > 42) {
-      goTo(active + (deltaX < 0 ? 1 : -1));
-    }
-  };
-
-  return (
-    <div
-      className={`carousel ${reducedMotion ? 'is-static' : ''}`}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
-    >
-      <div
-        className="carousel-viewport"
-        tabIndex="0"
-        aria-label="Couple gallery carousel"
-        onKeyDown={(event) => {
-          if (event.key === 'ArrowLeft') goTo(active - 1);
-          if (event.key === 'ArrowRight') goTo(active + 1);
-        }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-      >
-        <div className="carousel-track" style={{ transform: `translate3d(${-active * 100}%, 0, 0)` }}>
-          {config.assets.images.map((src, index) => (
-            <CarouselImage key={src} src={src} index={index} active={index === active} />
-          ))}
+    <div className="photo-date-strip" aria-hidden="true">
+      {photos.map((photo, index) => (
+        <div className={`photo-date-panel panel-${index}`} key={photo}>
+          <img src={photo} alt="" loading={index === 0 ? 'eager' : 'lazy'} />
         </div>
-      </div>
-      <div className="carousel-controls" aria-label="Gallery controls">
-        <button type="button" onClick={() => goTo(active - 1)} aria-label="Previous photo">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M15.2 5.2 8.4 12l6.8 6.8-1.4 1.4L5.6 12l8.2-8.2 1.4 1.4Z" />
-          </svg>
-        </button>
-        <button type="button" onClick={() => goTo(active + 1)} aria-label="Next photo">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m8.8 18.8 6.8-6.8-6.8-6.8 1.4-1.4 8.2 8.2-8.2 8.2-1.4-1.4Z" />
-          </svg>
-        </button>
-      </div>
-      <div className="carousel-dots" aria-label="Gallery navigation">
-        {config.assets.images.map((src, index) => (
-          <button
-            className={index === active ? 'is-active' : ''}
-            key={src}
-            type="button"
-            onClick={() => goTo(index)}
-            aria-label={`Show photo ${index + 1}`}
-            aria-current={index === active}
-          />
-        ))}
-      </div>
+      ))}
     </div>
   );
 }
@@ -894,23 +871,16 @@ export default function AnimatedInvite({ config }) {
         <p className="scroll-cue">scroll</p>
       </section>
 
-      <Section>
+      <Section className="countdown-section">
         <div className="section-heading">
           <LeafMark className="section-leaf" />
           <h2>Live countdown to the wedding</h2>
         </div>
+        <PhotoDateStrip config={config} />
         <Countdown config={config} />
       </Section>
 
-      <Section className="gallery-section">
-        <div className="section-heading">
-          <LeafMark className="section-leaf" />
-          <h2>Couple gallery</h2>
-        </div>
-        <GalleryCarousel config={config} reducedMotion={reducedMotion} />
-      </Section>
-
-      <Section>
+      <Section className="timeline-section">
         <div className="section-heading">
           <LeafMark className="section-leaf" />
           <h2>Event timeline</h2>
@@ -919,7 +889,7 @@ export default function AnimatedInvite({ config }) {
         <p className="muhurtham-line">Muhurtham {config.wedding.muhurtham}</p>
       </Section>
 
-      <Section>
+      <Section className="location-section">
         <div className="section-heading">
           <LeafMark className="section-leaf" />
           <h2>Location</h2>
@@ -930,7 +900,7 @@ export default function AnimatedInvite({ config }) {
         </a>
       </Section>
 
-      <Section>
+      <Section className="calendar-section">
         <div className="section-heading">
           <LeafMark className="section-leaf" />
           <h2>Add to calendar</h2>

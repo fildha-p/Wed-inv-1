@@ -9,7 +9,7 @@ const CONFIG = {
   envBg: '/env-bg.jpg',
   floralTop: '/floral-top.png',
   floralBottom: '/floral-bottom.png',
-  waxSeal: '/wax-seal.jpeg',
+  waxSeal: '/wax-seal.png',
   inviteScript: "You're Invited!",
   openLabel: 'Click to open',
   couple: {
@@ -172,25 +172,6 @@ function Countdown() {
         </div>
       ))}
     </div>
-  );
-}
-
-function GalleryImage({ src, index }) {
-  const [failed, setFailed] = useState(false);
-
-  return (
-    <figure className={`gallery-frame ${failed ? 'image-fallback' : ''}`}>
-      {!failed ? (
-        <img
-          src={src}
-          alt={`Dr Aiswarya and Dr Anugrah ${index + 1}`}
-          loading="lazy"
-          onError={() => setFailed(true)}
-        />
-      ) : (
-        <LeafMark className="fallback-leaf" />
-      )}
-    </figure>
   );
 }
 
