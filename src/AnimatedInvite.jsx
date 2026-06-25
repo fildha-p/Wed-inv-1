@@ -66,6 +66,33 @@ function AnimatedAmpersand() {
   );
 }
 
+function ActionIcon({ type }) {
+  if (type === 'map') {
+    return (
+      <svg className="action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 21s6-5.35 6-11a6 6 0 1 0-12 0c0 5.65 6 11 6 11Z" />
+        <circle cx="12" cy="10" r="2.2" />
+      </svg>
+    );
+  }
+
+  if (type === 'download') {
+    return (
+      <svg className="action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M12 4v10m0 0 4-4m-4 4-4-4" />
+        <path d="M5 18.5h14" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg className="action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <rect x="5" y="6" width="14" height="13" rx="2" />
+      <path d="M8 4v4m8-4v4M5 10h14" />
+    </svg>
+  );
+}
+
 function WaxSeal({ broken = false }) {
   return (
     <span className={`wax-seal ${broken ? 'is-broken' : ''}`}>
@@ -673,32 +700,7 @@ function createIcsFile(config) {
   URL.revokeObjectURL(url);
 }
 
-function MusicControl({ audioRef, playing, muted, setPlaying, setMuted }) {
-  const [showHint, setShowHint] = useState(true);
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => setShowHint(false), 4200);
-    return () => window.clearTimeout(timeout);
-  }, []);
-
-  const togglePlay = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    setShowHint(false);
-    if (audio.paused) {
-      try {
-        await audio.play();
-        setPlaying(true);
-      } catch {
-        setPlaying(false);
-      }
-    } else {
-      audio.pause();
-      setPlaying(false);
-    }
-  };
-
+function MusicControl({ audioRef, playing, muted, setMuted }) {
   const toggleMute = () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -708,24 +710,6 @@ function MusicControl({ audioRef, playing, muted, setPlaying, setMuted }) {
 
   return (
     <div className={`music-dock ${playing ? 'is-playing' : ''}`} aria-label="Music controls">
-      <span className={`music-hint ${showHint ? 'show' : ''}`}>tap for music</span>
-      <button
-        className="music-button"
-        type="button"
-        onClick={togglePlay}
-        aria-label={playing ? 'Pause music' : 'Play music'}
-        aria-pressed={playing}
-      >
-        {playing ? (
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M7 5h3v14H7V5Zm7 0h3v14h-3V5Z" />
-          </svg>
-        ) : (
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 5v14l11-7L8 5Z" />
-          </svg>
-        )}
-      </button>
       <button
         className="music-button music-button-small"
         type="button"
@@ -898,7 +882,8 @@ export default function AnimatedInvite({ config }) {
         </div>
         <p className="venue-name">{config.venue.name}</p>
         <a className="gold-button" href={config.venue.mapUrl} target="_blank" rel="noreferrer">
-          View on map
+          <ActionIcon type="map" />
+          <span>View on map</span>
         </a>
       </Section>
 
@@ -909,10 +894,12 @@ export default function AnimatedInvite({ config }) {
         </div>
         <div className="button-row">
           <a className="gold-button" href={config.calendar.googleUrl} target="_blank" rel="noreferrer">
-            Google Calendar
+            <ActionIcon type="calendar" />
+            <span>Google Calendar</span>
           </a>
           <button className="gold-button" type="button" onClick={() => createIcsFile(config)}>
-            Download .ics
+            <ActionIcon type="download" />
+            <span>Download .ics</span>
           </button>
         </div>
       </Section>
