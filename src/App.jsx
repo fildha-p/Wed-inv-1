@@ -30,8 +30,8 @@ const CONFIG = {
   wedding: {
     dateLabel: 'Saturday, 5 September 2026',
     malayalamDate: '1202 Chingam 20',
-    target: '2026-09-05T11:30:00+05:30',
-    muhurtham: '11:30 AM',
+    target: '2026-09-05T10:30:00+05:30',
+    muhurtham: '10:30 to 11:30 AM',
   },
   venue: {
     name: 'CIAL Convention Centre, Nedumbassery',
@@ -40,17 +40,17 @@ const CONFIG = {
   },
   calendar: {
     googleUrl:
-      'https://www.google.com/calendar/render?action=TEMPLATE&text=Aiswarya+%26+Anugrah+Wedding&dates=20260905T060000Z/20260905T063000Z&details=Muhurtham+11:30+AM&location=CIAL+Convention+Centre,+Nedumbassery',
+      'https://www.google.com/calendar/render?action=TEMPLATE&text=Aiswarya+%26+Anugrah+Wedding&dates=20260905T050000Z/20260905T060000Z&details=Muhurtham+10:30+to+11:30+AM&location=CIAL+Convention+Centre,+Nedumbassery',
     ics: {
       fileName: 'aiswarya-anugrah-wedding.ics',
       summary: 'Aiswarya & Anugrah Wedding',
       location: 'CIAL Convention Centre, Nedumbassery',
-      dtStart: '20260905T113000',
-      dtEnd: '20260905T120000',
+      dtStart: '20260905T103000',
+      dtEnd: '20260905T113000',
       tzid: 'Asia/Kolkata',
     },
   },
-  events: [{ title: 'Muhurtham', time: '11:30 AM' }],
+  events: [{ title: 'Muhurtham', time: '10:30 to 11:30 AM' }],
   assets: {
     images: [
       '/couple-1.jpeg',
