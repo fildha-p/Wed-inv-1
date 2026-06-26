@@ -872,7 +872,6 @@ export default function AnimatedInvite({ config }) {
           <h2>Event timeline</h2>
         </div>
         <Timeline config={config} />
-        <p className="muhurtham-line">Muhurtham {config.wedding.muhurtham}</p>
       </Section>
 
       <Section className="location-section">
